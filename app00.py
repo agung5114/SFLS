@@ -22,7 +22,7 @@ if choice == 'Driver Verification':
     from keras.applications.vgg16 import VGG16
     from sklearn.metrics.pairwise import cosine_similarity
     vgg16 = VGG16(weights='imagenet', include_top=False, 
-              pooling='max', input_shape=(224, 224,3))
+              pooling='max', input_shape=(224, 224, 3))
     for model_layer in vgg16.layers:
         model_layer.trainable = False
 
@@ -33,17 +33,17 @@ if choice == 'Driver Verification':
     #     # input_image = transform.resize(np_image, (224, 224, 3))
     #     resized_image = input_image.resize((224, 224))
     #     return resized_image
-    def load_image1(img_path):
-        input_image = image.load_img(img_path, target_size=(224, 224))
-        return input_image
-        # resized_image = transform.resize(input_image, (224, 224, 3))
-        # resized_image = input_image.resize((224, 224))
-        # return resized_image 
-    
-    def load_image2(image_data):
+    def load_image1(image_data):
         input_image = Image.open(image_data)
         resized_image = input_image.resize((224, 224))
-        return resized_image
+        return resized_image 
+    
+    def load_image2(image_data):
+        img = Image.open(image_data)
+        # img = np.array(img).astype('float32') / 255
+        newsize = (224, 224)
+        img = img.resize(newsize)
+        return img
     def get_image_embeddings(object_image : image):
         image_array = np.expand_dims(image.img_to_array(object_image), axis = 0)
         image_embedding = vgg16.predict(image_array)
@@ -51,7 +51,7 @@ if choice == 'Driver Verification':
     
     def get_similarity_score(first_image : str, second_image : str):
         first_image = load_image1(first_image)
-        second_image = load_image1(second_image)
+        second_image = load_image2(second_image)
         first_image_vector = get_image_embeddings(first_image)
         second_image_vector = get_image_embeddings(second_image)
         similarity_score = cosine_similarity(first_image_vector, second_image_vector).reshape(1,)
@@ -65,16 +65,58 @@ if choice == 'Driver Verification':
     url1 = f'{ctr}.png'
     img1 = Image.open(url1)
     st.image(img1)
-    # data1 = st.file_uploader('')
-    data1 = st.camera_input('')
+    data1 = st.file_uploader('')
     if data1 != None:
-        img2 = load_image1(data1)
+        img2 = load_image2(data1)
         st.image(img2)
         similarity_score = get_similarity_score(url1, data1)
-        # st.write(f'Similarity score: {similarity_score}')
-        st.write(f'Similarity score: {similarity_score[0]:.2f}')
+        st.write(similarity_score)
     else:
         st.write('Please Capture Photo')
+        
+    # img2 = st.file_uploader(label='Upload map image 2',type=['png', 'jpg'])
+    # img2 = st.camera_input(label='Upload map image 2')
+    # if img2 is not None:
+    #     st.subheader(f'Succesfully captured')
+    #     # input_image = load_image(img2)
+    #     input_image = img2.resize(224, 224)
+    # else:
+    #     st.write("No image captured")
+
+    
+    # if img3 is not None and img4 is not None:
+    #     # st.subheader(f'Tingkat perubahan:{(lum4-lum3):.4f}')
+    #     growth4 = (lum4-lum3)/lum3
+    #     # st.subheader(f'Persentase perubahan:{growth:.2%}')
+    #     fig4 = go.Figure()
+    #     fig4.add_trace(go.Indicator(
+    #                 mode = "number+delta",
+    #                 # value = status*100,
+    #                 value = int(lum3*100000)/100000,
+    #                 title = {"text": "Index 1:"},
+    #                 delta = {'reference': int(lum3*100000)/100000, 'relative': False},
+    #                 domain = {'row': 0, 'column': 0},
+    #                 ))
+    #     fig4.add_trace(go.Indicator(
+    #                     mode = "number+delta",
+    #                     # value = status*100,
+    #                     value = int(lum4*100000)/100000,
+    #                     title = {"text": "Index 2:"},
+    #                     delta = {'reference': int(lum3*100000)/100000, 'relative': False},
+    #                     domain = {'row': 0, 'column': 1},
+    #                     ))
+    #     fig4.add_trace(go.Indicator(
+    #                     mode = "delta",
+    #                     # value = status*100,
+    #                     value = int((1+growth4)*100000)/1000,
+    #                     title = {"text": "Tingkat Perbedaan (%):"},
+    #                     delta = {'reference': int(100), 'relative': False},
+    #                     domain = {'row': 0, 'column': 2},
+    #                     ))
+    #     fig4.update_layout(grid = {'rows': 1, 'columns': 3, 'pattern': "independent"})
+    #     st.plotly_chart(fig4,use_container_width=True)
+    # else:
+    #     st.empty()
 
 elif choice == 'Family Location History':
     # st.subheader('Peta Risiko Korupsi Pemerintah Daerah')
@@ -116,17 +158,17 @@ elif choice == 'Family Location History':
     st.subheader(f'Map of all pickups at {hour_to_filter}:00')
     st.map(filtered_data)
 
-    from pynetwork import draw_network
-    import plotly.io as pio
-    pio.templates.default = "plotly_dark"
-    dfnet = pd.read_csv('family.csv')
-    # st.dataframe(dfnet, use_container_width=True)
-    # parent = st.selectbox("Parent",dfnet['provinsi'].unique())
-    # provinsi = st.selectbox("Children",dfnet['provinsi'].unique())
-    # dfnet = pd.read_csv('')
-    # dfnet = dfnet[(dfnet['type']=='Father')| (dfnet['type']=='Mother')]
-    net1 = draw_network(dfnet,'attr','name','Burg', 'teal','nameid')
-    net1.update_layout(title_text='Family linked')
-    # net2 = draw_network(dfnet,'PARTAI','NAMA','Burg', 'teal','nilaitransaksi')
-    st.plotly_chart(net1,use_container_width=True)
-    st.dataframe(dfnet)
+from pynetwork import draw_network
+import plotly.io as pio
+pio.templates.default = "plotly_dark"
+dfnet = pd.read_csv('family.csv')
+# st.dataframe(dfnet, use_container_width=True)
+# parent = st.selectbox("Parent",dfnet['provinsi'].unique())
+# provinsi = st.selectbox("Children",dfnet['provinsi'].unique())
+# dfnet = pd.read_csv('')
+# dfnet = dfnet[(dfnet['type']=='Father')| (dfnet['type']=='Mother')]
+net1 = draw_network(dfnet,'attr','name','Burg', 'teal','nameid')
+net1.update_layout(title_text='Family linked')
+# net2 = draw_network(dfnet,'PARTAI','NAMA','Burg', 'teal','nilaitransaksi')
+st.plotly_chart(net1,use_container_width=True)
+st.dataframe(dfnet, use_container_width=True)
