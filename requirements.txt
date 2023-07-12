@@ -7,3 +7,4 @@ plotly-express
 networkx
 Pillow
 wordcloud
+scikit-learn
