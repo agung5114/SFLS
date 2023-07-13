@@ -59,7 +59,7 @@ if choice == 'Driver Verification':
 
     # st.subheader('Peta Risiko Korupsi Pemerintah Daerah')
     st.subheader('Perhitungan & Perbandingan Index Luminosity')
-    drivers = pd.read_csv('driverprofile.csv')
+    drivers = pd.read_csv('driverVal/driverprofile.csv')
     listdriver =  drivers['driver'].unique().tolist()
     ctr = st.selectbox("Pilih Pemda",listdriver)
     url1 = f'{ctr}.png'
@@ -80,7 +80,7 @@ elif choice == 'Family Location History':
     # st.subheader('Peta Risiko Korupsi Pemerintah Daerah')
     DATE_COLUMN = 'date/time'
     # DATE_COLUMN = 'Time'
-    DATA_URL = 'history.csv'
+    DATA_URL = 'driverVal/history.csv'
     @st.cache_data
     def load_data(nrows):
         data = pd.read_csv(DATA_URL, nrows=nrows)
@@ -119,7 +119,7 @@ elif choice == 'Family Location History':
     from pynetwork import draw_network
     import plotly.io as pio
     pio.templates.default = "plotly_dark"
-    dfnet = pd.read_csv('family.csv')
+    dfnet = pd.read_csv('driverVal/family.csv')
     # st.dataframe(dfnet, use_container_width=True)
     # parent = st.selectbox("Parent",dfnet['provinsi'].unique())
     # provinsi = st.selectbox("Children",dfnet['provinsi'].unique())
