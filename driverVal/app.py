@@ -4,7 +4,7 @@ import numpy as np
 
 
 from PIL import Image, ImageTransform as transform
-st.image(Image.open('maws-banner.png'))
+# st.image(Image.open('maws-banner.png'))
 st.markdown('<style>h1{color:dark-grey;font-size:62px}</style>',unsafe_allow_html=True)
 # st.sidebar.image(Image.open('maws-menu.png'))
 # menu = ['Peta','Monitoring Nasional','Analisis Risiko Pemerintah Daerah','Tren & Histori Sentimen Publik', 'Sentimen Publik Terkini','Analisis LHKPN','Smart Monitoring Program Daerah']
