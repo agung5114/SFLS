@@ -1,0 +1,10 @@
+streamlit
+keras
+tensorflow-cpu
+pandas
+matplotlib
+plotly-express
+networkx
+Pillow
+wordcloud
+scikit-learn
