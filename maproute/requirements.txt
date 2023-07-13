@@ -1,0 +1,10 @@
+# streamlit
+# pandas
+# plotly
+# networkx
+geopy
+# openrouteservice
+# streamlit-searchbox
+folium
+osmnx
+leafmap
