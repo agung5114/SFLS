@@ -62,7 +62,7 @@ if choice == 'Driver Verification':
     drivers = pd.read_csv('driverVal/driverprofile.csv')
     listdriver =  drivers['driver'].unique().tolist()
     ctr = st.selectbox("Pilih Pemda",listdriver)
-    url1 = f'driverVal/{ctr}.png'
+    url1 = f'driverVal/face/{ctr}.jpg'
     img1 = Image.open(url1)
     st.image(img1)
     # data1 = st.file_uploader('')
