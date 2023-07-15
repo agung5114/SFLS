@@ -82,7 +82,7 @@ elif choice == 'Driver Challenges':
     #         ''',width=900,height=700)
 elif choice == 'Safe & Fun Travel':
     submenu3 = st.sidebar.radio("",('Driver Verification', 'AI Driver Matching', 'Where to go?'))
-    if submenu3 == 'Data Historis':
+    if submenu3 == 'Driver Verification':
         from streamlit_cropper import st_cropper
         import numpy as np 
         from PIL import Image
