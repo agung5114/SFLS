@@ -74,7 +74,6 @@ if choice == 'Family Linked':
     # st.plotly_chart(net1,use_container_width=True)
     # st.dataframe(dfnet)
 elif choice == 'Driver Challenges':
-    elif choice == 'Driver Challenges':
     submenu2 = st.sidebar.radio("",('Driver Stats', 'Leaderboard'))
     if submenu2 == 'Driver Stats':
         linke = 'https://degaya.mofdac.com/'
@@ -85,7 +84,7 @@ elif choice == 'Driver Challenges':
     elif submenu2 == 'Leaderboard':
         linkc = 'https://degaya.mofdac.com/leaderboard'
         components.iframe(linkc, scrolling=True, height=1600)
-    linke = 'https://degaya.mofdac.com/'
+    # linke = 'https://degaya.mofdac.com/'
 
     # components.iframe(linke, scrolling=True, height=1600)
     # components.html('''
