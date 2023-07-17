@@ -1,187 +1,173 @@
-import os
-import uuid
-from flask import Flask, session,render_template,request, Response, redirect, send_from_directory
-from werkzeug.utils import secure_filename
-from werkzeug.security import check_password_hash, generate_password_hash
-from db import db_init, db
-from models import  User, Product, Item
-from datetime import datetime
-from flask_session import Session
-from helpers import login_required
-
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///items.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db_init(app)
-
-# Configure session to use filesystem
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-Session(app)
-
-#static file path
-@app.route("/static/<path:path>")
-def static_dir(path):
-    return send_from_directory("static", path)
-
-# Home route
-@app.route("/")
-def sign_in_page():
-    return render_template('index.html')
+import streamlit as st
+import pandas as pd
+import numpy as np
 
 
-@app.route("/logout")
-def logout():
-    return render_template('index.html')
+from PIL import Image, ImageTransform as transform
+import streamlit.components.v1 as components
+st.image(Image.open('driverVal/icons/banner.png'))
+st.markdown('<style>h1{color:dark-grey;font-size:62px}</style>',unsafe_allow_html=True)
+st.sidebar.image(Image.open('driverVal/icons/SFLS.png'))
+menu = ['Family Linked','Driver Challenges','Safe & Fun Travel']
+choice = st.sidebar.selectbox("Choose Menu",menu)
 
-# @app.route("/")
-# def sign_in_page():
-#     return render_template('sign_in.html')
+if choice == 'Family Linked':
+    submenu1 = st.sidebar.radio("",('Family Live Tracking', 'History', 'Subscription'))
+    if submenu1 == 'Family Live Tracking':
+        components.html('''
+                        <div class='tableauPlaceholder' id='viz1689442231553' style='position: relative'><noscript><a href='#'><img alt='Children&#39;s Route  ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Ch&#47;ChildrensRouteMonitor&#47;ChildrensRoute_1&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='ChildrensRouteMonitor&#47;ChildrensRoute_1' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Ch&#47;ChildrensRouteMonitor&#47;ChildrensRoute_1&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1689442231553');                    var vizElement = divElement.getElementsByTagName('object')[0];                    if ( divElement.offsetWidth > 800 ) { vizElement.style.minWidth='420px';vizElement.style.maxWidth='650px';vizElement.style.width='100%';vizElement.style.minHeight='587px';vizElement.style.maxHeight='887px';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';} else if ( divElement.offsetWidth > 500 ) { vizElement.style.minWidth='420px';vizElement.style.maxWidth='650px';vizElement.style.width='100%';vizElement.style.minHeight='587px';vizElement.style.maxHeight='887px';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';} else { vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*1.77)+'px';}                     var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                        ''',
+                        width=350,height=700)
+    if submenu1 == 'History':
+        DATE_COLUMN = 'date/time'
+        DATA_URL = ('https://s3-us-west-2.amazonaws.com/'
+                'streamlit-demo-data/uber-raw-data-sep14.csv.gz')
 
-@app.route("/home", methods=["GET", "POST"])
-def sign_in_proses():
-    if request.method == "POST":
-        user_name = request.form.get("username")
-        if user_name == 'resto':
-            return render_template("resto.html")
-        elif user_name == 'farmer':
-            return render_template("farmer.html")
-        elif user_name == 'user':
-            return render_template("user_food.html")
-        else:
-            return render_template("404.html")
-
-# User Menu
-@app.route("/")
-def index():
-	bbrows = Item.query.filter_by(category='Bakery & Breakfast')
-	idrows = Item.query.filter_by(category='Indonesian')
-	ffrows = Item.query.filter_by(category='Fast Food')
-	return render_template("user_food.html", bbrows=bbrows,idrows=idrows,ffrows=ffrows)
-
-
-@app.route("/food",  methods=["GET", "POST"])
-def food():
-	bbrows = Item.query.filter_by(category='Bakery & Breakfast')
-	idrows = Item.query.filter_by(category='Indonesian')
-	ffrows = Item.query.filter_by(category='Fast Food')
-	return render_template("user_food.html", bbrows=bbrows,idrows=idrows,ffrows=ffrows)
-
-@app.route("/user_profile")
-def user_profile():
-    return render_template('input_user_profile.html')
-
-@app.route("/food_vision")
-def food_vision():
-    return render_template('food_vision.html')
+        @st.cache_data
+        def load_data(nrows):
+            data = pd.read_csv(DATA_URL, nrows=nrows)
+            lowercase = lambda x: str(x).lower()
+            data.rename(lowercase, axis='columns', inplace=True)
+            data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN])
+            return data
 
 
-@app.route("/farmer")
-def farmer():
-    return render_template('farmer.html')
+
+        # Create a text element and let the reader know the data is loading.
+        data_load_state = st.text('Loading data...')
+        # Load 10,000 rows of data into the dataframe.
+        data = load_data(1000)
+        # data.to_csv('data.csv',index=False)
+        # Notify the reader that the data was successfully loaded.
+        data_load_state.text("Done!(using st.cache_data)")
 
 
-@app.route("/resto")
-def resto():
-	idrows = Item.query.filter_by(category='Indonesian')
-	return render_template('resto.html',idrows=idrows)
+        if st.checkbox('Show raw data'):
+            st.subheader('Raw data')
+            st.write(data)
 
 
-#login as merchant
-@app.route("/login", methods=["GET", "POST"])
-def login():
-	if request.method=="POST":
-		session.clear()
-		username = request.form.get("username")
-		password = request.form.get("password")
-		result = User.query.filter_by(username=username).first()
-		print(result)
-		# Ensure username exists and password is correct
-		if result == None or not check_password_hash(result.password, password):
-			return render_template("error.html", message="Invalid username and/or password")
-		# Remember which user has logged in
-		session["username"] = result.username
-		return redirect("/home")
-	return render_template("login.html")
+        st.subheader('Number of pickups by hour')
 
-# #logout
-# @app.route("/logout")
-# def logout():
-# 	session.clear()
-# 	return redirect("/login")
+        hist_values = np.histogram(data[DATE_COLUMN].dt.hour, bins=24, range=(0,24))[0]
 
-#signup as merchant
-@app.route("/signup", methods=["GET","POST"])
-def signup():
-	if request.method=="POST":
-		session.clear()
-		password = request.form.get("password")
-		repassword = request.form.get("repassword")
-		if(password!=repassword):
-			return render_template("error.html", message="Passwords do not match!")
-
-		#hash password
-		pw_hash = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
-		
-		fullname = request.form.get("fullname")
-		username = request.form.get("username")
-		#store in database
-		new_user =User(fullname=fullname,username=username,password=pw_hash)
-		try:
-			db.session.add(new_user)
-			db.session.commit()
-		except:
-			return render_template("error.html", message="Username already exists!")
-		return render_template("login.html", msg="Account created!")
-	return render_template("signup.html")
-
-#merchant home page to add new products and edit existing products
-@app.route("/home", methods=["GET", "POST"], endpoint='home')
-@login_required
-def home():
-	if request.method == "POST":
-		image = request.files['image']
-		filename = str(uuid.uuid1())+os.path.splitext(image.filename)[1]
-		image.save(os.path.join("static/images", filename))
-		category= request.form.get("category")
-		name = request.form.get("pro_name")
-		description = request.form.get("description")
-		price_range = request.form.get("price_range")
-		comments = request.form.get("comments")
-		new_pro = Product(category=category,name=name,description=description,price_range=price_range,comments=comments, filename=filename, username=session['username'])
-		db.session.add(new_pro)
-		db.session.commit()
-		rows = Product.query.filter_by(username=session['username'])
-		return render_template("home.html", rows=rows, message="Product added")
-	
-	rows = Product.query.filter_by(username=session['username'])
-	return render_template("home.html", rows=rows)
-
-#when edit product option is selected this function is loaded
-@app.route("/edit/<int:pro_id>", methods=["GET", "POST"], endpoint='edit')
-@login_required
-def edit(pro_id):
-	#select only the editing product from db
-	result = Product.query.filter_by(pro_id = pro_id).first()
-	if request.method == "POST":
-		#throw error when some merchant tries to edit product of other merchant
-		if result.username != session['username']:
-			return render_template("error.html", message="You are not authorized to edit this product")
-		category= request.form.get("category")
-		name = request.form.get("pro_name")
-		description = request.form.get("description")
-		price_range = request.form.get("price_range")
-		comments = request.form.get("comments")
-		result.category = category
-		result.name = name
-		result.description = description
-		result.comments = comments
-		result.price_range = price_range
-		db.session.commit()
-		rows = Product.query.filter_by(username=session['username'])
-		return render_template("home.html", rows=rows, message="Product edited")
-	return render_template("edit.html", result=result)
+        st.bar_chart(hist_values)
 
 
-if __name__ == "__main__":
-    app.run(debug=True)
+        hour_to_filter = st.slider('hour', 0, 23, 17)  # min: 0h, max: 23h, default: 17h
+        filtered_data = data[data[DATE_COLUMN].dt.hour == hour_to_filter]
+        st.subheader(f'Map of all pickups at {hour_to_filter}:00')
+        st.map(filtered_data)
+
+    # from pynetwork import draw_network
+    # import plotly.io as pio
+    # pio.templates.default = "plotly_dark"
+    # dfnet = pd.read_csv('driverVal/family.csv')
+    # # st.dataframe(dfnet, use_container_width=True)
+    # # parent = st.selectbox("Parent",dfnet['provinsi'].unique())
+    # # provinsi = st.selectbox("Children",dfnet['provinsi'].unique())
+    # # dfnet = pd.read_csv('')
+    # # dfnet = dfnet[(dfnet['type']=='Father')| (dfnet['type']=='Mother')]
+    # net1 = draw_network(dfnet,'attr','name','Burg', 'teal','nameid')
+    # net1.update_layout(title_text='Family linked')
+    # # net2 = draw_network(dfnet,'PARTAI','NAMA','Burg', 'teal','nilaitransaksi')
+    # st.plotly_chart(net1,use_container_width=True)
+    # st.dataframe(dfnet)
+elif choice == 'Driver Challenges':
+    submenu2 = st.sidebar.radio("",('Driver Stats', 'Leaderboard'))
+    if submenu2 == 'Driver Stats':
+        linke = 'https://degaya.mofdac.com/'
+        components.iframe(linke, scrolling=True, height=1600)
+    # components.html('''
+    #         <div class='tableauPlaceholder' id='viz1683812683355' style='position: relative'><noscript><a href='#'><img alt='Tingkat Kerawanan dan Upaya Pencegahan Korupsi ' src='{linke}' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value={linke} /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='IndeksSPI&#47;Dashboard1' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;In&#47;IndeksSPI&#47;Dashboard1&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1683812683355');                    var vizElement = divElement.getElementsByTagName('object')[0];                    if ( divElement.offsetWidth > 800 ) { vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';} else if ( divElement.offsetWidth > 500 ) { vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';} else { vizElement.style.width='100%';vizElement.style.height='977px';}                     var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+    #         ''',width=900,height=700)
+    elif submenu2 == 'Leaderboard':
+        linkc = 'https://degaya.mofdac.com/leaderboard'
+        components.iframe(linkc, scrolling=True, height=1600)
+    # linke = 'https://degaya.mofdac.com/'
+
+    # components.iframe(linke, scrolling=True, height=1600)
+    # components.html('''
+    #         <div class='tableauPlaceholder' id='viz1683812683355' style='position: relative'><noscript><a href='#'><img alt='Tingkat Kerawanan dan Upaya Pencegahan Korupsi ' src='{linke}' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value={linke} /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='IndeksSPI&#47;Dashboard1' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;In&#47;IndeksSPI&#47;Dashboard1&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1683812683355');                    var vizElement = divElement.getElementsByTagName('object')[0];                    if ( divElement.offsetWidth > 800 ) { vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';} else if ( divElement.offsetWidth > 500 ) { vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';} else { vizElement.style.width='100%';vizElement.style.height='977px';}                     var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+    #         ''',width=900,height=700)
+elif choice == 'Safe & Fun Travel':
+    submenu3 = st.sidebar.radio("",('Driver Verification', 'AI Driver Matching', 'Where to go?'))
+    if submenu3 == 'Driver Verification':
+        from streamlit_cropper import st_cropper
+        import numpy as np 
+        from PIL import Image
+        from tensorflow.keras.preprocessing import image
+        from keras.applications.vgg16 import VGG16
+        from sklearn.metrics.pairwise import cosine_similarity
+        from PIL import Image
+        import io
+
+        st.set_option('deprecation.showfileUploaderEncoding', False)
+        # st.header("Capture the driver face")
+        # img_file = st.sidebar.file_uploader(label='Upload a file', type=['png', 'jpg'])
+        
+        
+        vgg16 = VGG16(weights='imagenet', include_top=False, 
+                pooling='max', input_shape=(224, 224,3))
+        for model_layer in vgg16.layers:
+            model_layer.trainable = False
+
+        def load_image1(img_path):
+            input_image = image.load_img(img_path, target_size=(224, 224))
+            # input_image  = image.img_to_array(img_path)
+            return input_image
+        
+        def load_image2(im):
+            byteIO = io.BytesIO()
+            im.save(byteIO, format='PNG')
+            byteArr = byteIO.getvalue()
+            return byteArr
+            # input_image = Image.open(image_data)
+            # resized_image = input_image.resize((224, 224))
+            # return resized_image
+        def get_image_embeddings(object_image : image):
+            image_array = np.expand_dims(image.img_to_array(object_image), axis = 0)
+            image_embedding = vgg16.predict(image_array)
+            return image_embedding
+        
+        def get_similarity_score(first_image : str, second_image : str):
+            first_image = load_image1(first_image)
+            second_image = load_image1(second_image)
+            first_image_vector = get_image_embeddings(first_image)
+            second_image_vector = get_image_embeddings(second_image)
+            similarity_score = cosine_similarity(first_image_vector, second_image_vector).reshape(1,)
+            return similarity_score
+
+        # st.subheader('Peta Risiko Korupsi Pemerintah Daerah')
+        st.subheader('Computer Vision - Face Verification')
+        drivers = pd.read_csv('driverVal/driverprofile.csv')
+        listdriver =  drivers['driver'].unique().tolist()
+        ctr = st.selectbox("Selected Driver",listdriver)
+        url1 = f'driverVal/face/{ctr}.jpg'
+        img1 = Image.open(url1)
+        img_file = st.camera_input('')
+
+        if img_file:
+            img = Image.open(img_file)
+            cropped_img = st_cropper(img, realtime_update=True, box_color='#0000FF',
+                                        aspect_ratio=(2, 2))
+        
+            # st.write("Preview")
+            # _ = cropped_img.thumbnail((224,224))
+            # st.image(cropped_img)
+            similarity_score = get_similarity_score(url1,img_file)
+            c1,c2 = st.columns((1,1))
+            with c1:
+                st.write("Driver Photo from database")
+                img1 = img1.resize((224,224))
+                st.image(img1)
+            with c2:
+                st.write("Driver Photo Captured")
+                # _ = cropped_img.thumbnail((224,224))
+                st.image(cropped_img.resize((224,224)))
+            st.subheader(f'Similarity score: {similarity_score[0]*100:.2f}%')
+    elif submenu3 == 'AI Driver Matching':
+        pass
+    elif submenu3 =='Where to go?':
+        pass
+    

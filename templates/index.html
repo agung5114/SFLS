@@ -56,9 +56,15 @@
       <div
         class="page-header align-items-start min-vh-100"
         style="
-          background-image: url('https://images.unsplash.com/photo-1497294815431-9365093b7331?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1950&q=80');
+          background-image: url('https://images.unsplash.com/photo-1533408874882-397bf377a8c2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
         "
       >
+      <!-- <div
+        class="page-header align-items-start min-vh-100"
+        style="
+          background-image: url('https://images.unsplash.com/photo-1497294815431-9365093b7331?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1950&q=80');
+        "
+      > -->
         <span class="mask bg-gradient-dark opacity-6"></span>
         <!-- <div class="container my-auto"> -->
         <div class="container my-auto">
@@ -77,17 +83,17 @@
                     <h5
                       class="text-white font-weight-bolder text-center mt-2 mb-0"
                     >
-                      Grab Food User
+                      Family-Linked
                     </h5>
                   </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body align-items-center">
                   <div class="border-radius-lg">
-                    <a href="{{ url_for('food') }}">
+                    <a href="{{ url_for('family') }}">
                       <img
-                        src="/static/images/hamburger.png"
-                        alt="user_food"
-                        class="w-100 border-radius-lg"
+                        src="/static/icons/family.png"
+                        alt="family"
+                        class="h-50 border-radius-lg"
                       />
                     </a>
                   </div>
@@ -105,17 +111,17 @@
                     <h5
                       class="text-white font-weight-bolder text-center mt-2 mb-0"
                     >
-                      Grab Farmer
+                      Competitive Drivers 
                     </h5>
                   </div>
                 </div>
                 <div class="card-body">
                   <div class="border-radius-lg">
-                    <a href="{{ url_for('farmer') }}">
+                    <a href="{{ url_for('driver') }}">
                       <img
-                        src="/static/images/farmer.png"
-                        alt="farmer"
-                        class="w-100 border-radius-lg"
+                        src="/static/icons/driver.png"
+                        alt="driver"
+                        class="h-50 border-radius-lg"
                       />
                     </a>
                   </div>
@@ -133,17 +139,17 @@
                     <h5
                       class="text-white font-weight-bolder text-center mt-2 mb-0"
                     >
-                      Grab Merchant
+                      Safe & Fun Travel
                     </h5>
                   </div>
                 </div>
                 <div class="card-body">
-                  <div class="border-radius-lg">
-                    <a href="{{ url_for('resto') }}">
+                  <div class="border-radius-lg justify-content-lg-center">
+                    <a href="{{ url_for('travel') }}">
                       <img
-                        src="/static/images/shop.png"
-                        alt="Merchant"
-                        class="w-100 border-radius-lg"
+                        src="/static/icons/travel.png"
+                        alt="travel"
+                        class="v-50 h-100 border-radius-lg"
                       />
                     </a>
                   </div>
