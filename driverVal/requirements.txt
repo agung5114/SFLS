@@ -8,3 +8,4 @@ networkx
 Pillow
 wordcloud
 scikit-learn
+streamlit-cropper
